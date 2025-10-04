@@ -29,6 +29,7 @@ public interface IIscrizioneController {
         @Operation(summary = "Recupera iscrizioni", description = "Recupera tutte le iscrizioni presenti nel Database, filtrate opzionalmente per id del corso, nome, cognome o email del partecipante")
         @ApiResponses(value = {
                         @ApiResponse(responseCode = "200", description = "Lista delle iscrizioni recuperata con successo", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, array = @ArraySchema(schema = @Schema(implementation = Iscrizione.class)))),
+                        @ApiResponse(responseCode = "404", description = "Corso con id specificato non trovato", content = @Content),
                         @ApiResponse(responseCode = "400", description = "Parametri di ricerca non validi", content = @Content),
                         @ApiResponse(responseCode = "500", description = "Errore Interno del Server", content = @Content)
         })

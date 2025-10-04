@@ -36,6 +36,11 @@ public class IscrizioneService implements IIscrizioneService {
         @Override
         public List<Iscrizione> getAllEnrollments(Integer corsoId, String nome,
                         String cognome, String email) {
+
+                if (corsoId != null && !corsoRepository.existsById(corsoId)) {
+                        throw new CorsoNotFoundException(corsoId);
+                }
+
                 return iscrizioneRepository.findAll().stream()
                                 .filter(i -> corsoId == null || i.getCorso().getCorsoId().equals(corsoId))
                                 .filter(i -> nome == null || nome.trim().isEmpty() ||

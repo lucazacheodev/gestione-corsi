@@ -1,0 +1,219 @@
+openapi: 3.1.0
+info:
+  title: API Gestione Corsi e Iscrizioni
+  description: API per la gestione dei corsi formativi e delle iscrizioni dei partecipanti
+  contact:
+    name: Luca Zacheo
+    email: lucazacheo@outlook.com
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.0
+servers:
+- url: http://localhost:8080
+  description: Server di sviluppo locale
+tags:
+- name: Corsi
+  description: Gestione dei corsi
+- name: Iscrizioni
+  description: Gestione delle iscrizioni
+paths:
+  /enrollments:
+    get:
+      tags:
+      - Iscrizioni
+      summary: Recupera iscrizioni
+      description: "Recupera tutte le iscrizioni presenti nel Database, filtrate opzionalmente\
+        \ per id del corso, nome, cognome o email del partecipante"
+      operationId: getAllEnrollments
+      parameters:
+      - name: corsoId
+        in: query
+        description: id del corso
+        required: false
+        schema:
+          type: integer
+          format: int32
+        example: 1
+      - name: nome
+        in: query
+        description: nome del partecipante
+        required: false
+        schema:
+          type: string
+        example: Luca
+      - name: cognome
+        in: query
+        description: cognome del partecipante
+        required: false
+        schema:
+          type: string
+        example: Zacheo
+      - name: email
+        in: query
+        description: email del partecipante
+        required: false
+        schema:
+          type: string
+          format: email
+        example: lucazacheo@outlook.com
+      responses:
+        "200":
+          description: Lista delle iscrizioni recuperata con successo
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/IscrizioneDTO"
+        "400":
+          description: Parametri di ricerca non validi
+        "500":
+          description: Errore Interno del Server
+    post:
+      tags:
+      - Iscrizioni
+      summary: Aggiungi iscrizione
+      description: Aggiunge una nuova iscrizione ad un corso inseriti i dati del partecipante
+        e l'id del corso
+      operationId: addEnrollment
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/IscrizioneDTO"
+        required: true
+      responses:
+        "201":
+          description: Iscrizione creata con successo
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/IscrizioneDTO"
+        "400":
+          description: Dati in input non validi
+        "409":
+          description: Iscrizione già esistente per questo partecipante e corso
+        "422":
+          description: "Corso pieno, impossibile aggiungere l'iscrizione"
+        "500":
+          description: Errore interno del server
+  /courses:
+    get:
+      tags:
+      - Corsi
+      summary: Recupera corsi disponibili
+      description: "Recupera tutti i corsi con posti ancora disponibili, filtrati\
+        \ opzionalmente per titolo, luogo e data"
+      operationId: getAllCorsi
+      parameters:
+      - name: titolo
+        in: query
+        description: titolo del corso
+        required: false
+        schema:
+          type: string
+        example: Java Programming Base
+      - name: luogo
+        in: query
+        description: luogo del corso
+        required: false
+        schema:
+          type: string
+        example: Aula Magna - Polo Formativo
+      - name: data
+        in: query
+        description: data del corso
+        required: false
+        schema:
+          type: string
+          format: date
+        example: 2024-12-31
+      responses:
+        "200":
+          description: Lista dei corsi recuperata con successo
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CorsoDTO"
+        "400":
+          description: Parametro di ricerca non valido
+        "500":
+          description: Errore Interno del Server
+components:
+  schemas:
+    IscrizioneDTO:
+      type: object
+      description: Rappresenta un'iscrizione ad un corso
+      properties:
+        iscrizioneId:
+          type: integer
+          format: int32
+          description: ID univoco dell'iscrizione
+          example: 1
+          readOnly: true
+        corsoId:
+          type: integer
+          format: int32
+          description: ID del corso a cui l'utente si è iscritto
+          example: 1
+        partecipanteNome:
+          type: string
+          description: Nome del partecipante
+          example: Luca
+          maxLength: 30
+          minLength: 0
+        partecipanteCognome:
+          type: string
+          description: Cognome del partecipante
+          example: Zacheo
+          maxLength: 30
+          minLength: 0
+        partecipanteEmail:
+          type: string
+          format: email
+          description: Email del partecipante
+          example: lucazacheo@outlook.com
+          maxLength: 50
+          minLength: 0
+        dataOraIscrizione:
+          type: string
+          format: date-time
+          description: Data e ora dell'iscrizione
+          example: 2024-06-15T14:30:00
+          readOnly: true
+      required:
+      - corsoId
+      - partecipanteCognome
+      - partecipanteEmail
+      - partecipanteNome
+    CorsoDTO:
+      type: object
+      description: Rappresenta un corso con le sue iscrizioni
+      properties:
+        corsoId:
+          type: integer
+          format: int32
+          description: ID univoco del corso
+          example: 1
+          readOnly: true
+        titolo:
+          type: string
+          description: Titolo del corso
+          example: Corso di Java
+        dataOraInizio:
+          type: string
+          format: date-time
+          description: Data e ora di inizio del corso
+          example: 2024-07-01T10:00:00
+        luogo:
+          type: string
+          description: luogo dove si svolge il corso
+          example: Aula Magna - Polo Formativo
+        disponibilita:
+          type: integer
+          format: int32
+          description: Numero massimo di partecipanti al corso
+          example: 30
