@@ -5,12 +5,14 @@ import java.util.List;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RestController;
 
 import it.lucazacheo.gestione_corsi_backend.controller.api.ICorsoController;
 import it.lucazacheo.gestione_corsi_backend.model.Corso;
 import it.lucazacheo.gestione_corsi_backend.service.api.ICorsoService;
 
+@CrossOrigin(origins = "http://localhost:5173")
 @RestController
 @Validated
 public class CorsoController implements ICorsoController {
